@@ -1,0 +1,112 @@
+---
+title: "Command Line for Data Science"
+author: "Samuel Chan"
+date: "Updated: January 14, 2019"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: 
+        collapsed: false
+    number_sections: true
+    theme: cosmo
+  fig_caption: yes
+  pdf_document:
+    latex_engine: xelatex
+    fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## `head`, `tail` and `sed`
+
+The current chunk prints our working directory and the last 3 lines of the file:
+```{bash}
+pwd
+tail -3 rice.csv
+```
+
+We can also use the `|` operator to chain operations in a `%>%`-like manner. This takes the output of one command and pass it as input to a second command.
+Notice that in the following chunk, we use `sed` (stands for Stream Editor) to skip the first 1 line. `1` means one line and `d` means delete. From the resulting output, we want to only see the first 6 lines so we chain the `head` command with the `|` operator.
+
+```{bash}
+# sed '1d' rice.csv 
+sed 1d rice.csv | head -6
+```
+
+In addition to the pipe operator(`|`), we can instead print the output to a file using output redirection (`>`). In the following code we skipped the first 4 lines and print the resulting output to a file named `temporary.csv`:
+
+```{bash}
+sed 1,4d rice.csv > temporary.csv
+head -1 rice.csv > names.txt
+```
+
+Note that in the chunk above, if the file already existed its content will be replaced. If we simply wanted to add the output of the command to the file as an append, then we would instead do `sed 1,4d rice.csv >> temporary.csv`
+
+```{r}
+temp <- read.csv("temporary.csv", header=FALSE)
+cols <- strsplit(readLines("names.txt"), split = ",")[[1]]
+
+colnames(temp) <- cols
+head(temp)
+```
+
+## `grep` for regex matching
+In the following command, we're asking for any line that has "12" at the beginning of line:
+```{bash}
+grep "^12" rice.csv
+```
+
+Matches line that has "12" at the beginning and "07" at the end:
+```{bash}
+grep "^12.*07$" rice.csv
+```
+
+We can also use the `-v` flag to do an invert-match. The following command will try to match the lines which would otherwise not match:
+```{bash}
+grep -v "^[0-8].*07$" rice.csv
+```
+
+## `wc` for wordCount, lineCount and charCount
+The `wc` utility count the number of lines in its input when used with the `-l` flag. The following prints the number of lines in each file it finds in the directory (verify using `ls`):
+```{bash}
+wc -l *
+```
+
+- `-w` option count the number of words  
+- `-m` count the number of characters  
+- `-c` the number of bytes
+```{bash}
+wc -m *
+```
+
+If you use Finder or window explorer - you can verify that the size is in fact consistent with what the `wc` utility returns.
+
+Putting together what we've just learned, a practical use-case is when we need to count the number of lines in a code skipping any comment (assuming a comment line starts with the `#` sign):
+```{bash}
+grep -v "^#" rice.csv | wc -l
+```
+
+To take the example a little further, you can also imagine how we want to save only the raw data without the header line and the first few comment lines. We use `cat` to send the content of our file to `grep` which then send its output to `sed`:
+```{bash}
+cat rice.csv | grep -v "^#"  | sed "1d" > onlydata.csv
+```
+
+### Extra Details
+If the end-of-line (`$`) doesn't work in our `grep` commands, there's a chance that it is caused by the DOS/Windows line-ending character. To verify this:
+```{bash}
+cat -vte rice.csv | head -5
+```
+
+If you see `2018-07M$` or other line-ending characters, then use the Vim editor the set the file format before writing and quiting (`:wq`):
+```{bash eval=FALSE}
+vi rice.csv
+:set fileformat=unix
+:wq
+```
+
+
+
+

@@ -94,7 +94,16 @@ To take the example a little further, you can also imagine how we want to save o
 cat rice.csv | grep -v "^#"  | sed "1d" > onlydata.csv
 ```
 
-### Extra Details
+If we have wanted instead to count the number of lines in a file **excluding** header and comments, then the code is similar to the one above, except for the in-place substitution of `> onlydata.csv` for `| wc -l`. 
+
+## Counting columns with `awk` 
+Awk is a scripting language used commonly for text-processing. The `NF` in the following code stands for "Number of Fields" in the input and the `FS=,` tells `awk` that the field separator is a comma; The output is chained to `uniq` so instead of printing n number of values we get only the unique number of values present in the field.
+```{bash}
+cat rice.csv | grep -v "^#" | awk "{print NF}" FS=, | uniq
+```
+
+
+## Extra Details
 If the end-of-line (`$`) doesn't work in our `grep` commands, there's a chance that it is caused by the DOS/Windows line-ending character. To verify this:
 ```{bash}
 cat -vte rice.csv | head -5
@@ -107,6 +116,10 @@ vi rice.csv
 :wq
 ```
 
+
+```{r}
+lapply(1:5, FUN=function(x, y=1:5){x+1+y})
+```
 
 
 

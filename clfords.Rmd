@@ -36,6 +36,8 @@ Notice that in the following chunk, we use `sed` (stands for Stream Editor) to s
 sed 1d rice.csv | head -6
 ```
 
+### Practice 1
+
 In addition to the pipe operator(`|`), we can instead print the output to a file using output redirection (`>`). In the following code we skipped the first 4 lines and print the resulting output to a file named `temporary.csv`:
 
 ```{bash}
@@ -64,6 +66,7 @@ Matches line that has "12" at the beginning and "07" at the end:
 grep "^12.*07$" rice.csv
 ```
 
+### Practice 2
 We can also use the `-v` flag to do an invert-match. The following command will try to match the lines which would otherwise not match:
 ```{bash}
 grep -v "^[0-8].*07$" rice.csv
@@ -94,7 +97,9 @@ To take the example a little further, you can also imagine how we want to save o
 cat rice.csv | grep -v "^#"  | sed "1d" > onlydata.csv
 ```
 
+### Practice 3
 If we have wanted instead to count the number of lines in a file **excluding** header and comments, then the code is similar to the one above, except for the in-place substitution of `> onlydata.csv` for `| wc -l`. 
+
 
 ## Counting columns with `awk` 
 Awk is a scripting language used commonly for text-processing. The `NF` in the following code stands for "Number of Fields" in the input and the `FS=,` tells `awk` that the field separator is a comma; The output is chained to `uniq` so instead of printing n number of values we get only the unique number of values present in the field.
@@ -117,9 +122,6 @@ vi rice.csv
 ```
 
 
-```{r}
-lapply(1:5, FUN=function(x, y=1:5){x+1+y})
-```
 
 
 
